@@ -1,0 +1,22 @@
+body {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* height: 100vh; */
+    background-color: #2fc14f;
+}
+
+.game-container {
+    position: relative;
+    width: 100vh;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+canvas {
+    /* border: 1px solid #000000; */
+    background-color: #c0e3e400;
+}
