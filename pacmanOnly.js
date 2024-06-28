@@ -215,13 +215,13 @@ update();
 
 
 
-        /*function drawPacMan() {
+    /*function drawPacMan() {
     context.fillStyle = 'yellow';
     context.beginPath();
     context.arc(pacMan.x * gridSize + gridSize / 2, pacMan.y * gridSize + gridSize / 2, pacMan.size, 0.2 * Math.PI, 1.8 * Math.PI);
     context.lineTo(pacMan.x * gridSize + gridSize / 2, pacMan.y * gridSize + gridSize / 2);
     context.fill();
-}*/
+    }
 
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -232,4 +232,227 @@ update();
         [1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1],
         [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1],
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        const canvas = document.getElementById('gameCanvas');
+const context = canvas.getContext('2d');
+
+const width = window.innerWidth;
+const height = window.innerHeight;
+
+canvas.width = width > height ? height * 0.95 : width * 0.95;
+canvas.height = canvas.width;
+
+window.addEventListener('resize', () => {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    canvas.width = width > height ? height * 0.95 : width * 0.95;
+    canvas.height = canvas.width;
+});
+
+const gridSize = 25; //Tamaño de los pixeles de cada cuadro del laberinto
+const tileCount = Math.floor(canvas.width / gridSize);
+
+let pacMan = {
+    x: 1,  // Coordenada X inicial específica del laberinto
+    y: 1,  // Coordenada Y inicial específica del laberinto
+    dx: 0,
+    dy: 0,
+    size: gridSize / 2
+};
+
+let currentLevel = 1;
+let mazeLevels = [
+    [   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
+        [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1],
+        [1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1],
+        [1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1],
+        [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1]],
+    
+    [   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
+        [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1],
+        [1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1],
+        [1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1],
+        [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1]],
+];
+
+let currentMaze = mazeLevels[currentLevel - 1];
+
+let lastRow = currentMaze.length - 1;
+let lastCol = currentMaze[lastRow].length - 1;
+
+let end = {
+    x: lastCol-1,  // Coordenada X inicial específica del laberinto
+    y: lastRow,  // Coordenada Y inicial específica del laberinto
+    dx: 0,
+    dy: 0,
+    size: gridSize / 2
+};
+const pacManImage = new Image();
+pacManImage.src = 'Numberblock 1.png';
+const endImage = new Image();
+endImage.onload = function() {
+    console.log("Imagen cargada correctamente.");
+    drawEnd(); // Llamar a la función de dibujo una vez que la imagen esté cargada
+};
+
+endImage.onerror = function() {
+    console.error("Error al cargar la imagen.");
+};
+endImage.src = 'Numberblock 2.png';
+
+function drawMaze() {
+    for (let row = 0; row < currentMaze.length; row++) {
+        for (let col = 0; col < currentMaze[row].length; col++) {
+            if (currentMaze[row][col] === 1) {
+                context.fillStyle = 'blue';
+                context.fillRect(col * gridSize, row * gridSize, gridSize, gridSize);
+            }
+        }
+    }
+}
+
+function drawPacMan() {
+    context.drawImage(pacManImage, pacMan.x * gridSize, pacMan.y * gridSize, gridSize, gridSize);
+}
+function drawEnd() {
+    context.drawImage(endImage, end.x * gridSize, end.y * gridSize, gridSize, gridSize);
+}
+function movePacMan(event) {
+    switch(event.key) {
+        case 'ArrowUp':
+            pacMan.dx = 0;
+            pacMan.dy = -1;
+            break;
+        case 'ArrowDown':
+            pacMan.dx = 0;
+            pacMan.dy = 1;
+            break;
+        case 'ArrowLeft':
+            pacMan.dx = -1;
+            pacMan.dy = 0;
+            break;
+        case 'ArrowRight':
+            pacMan.dx = 1;
+            pacMan.dy = 0;
+            break;
+    }
+    updatePacManPosition();
+}
+
+function updatePacManPosition() {
+    const nextX = pacMan.x + pacMan.dx;
+    const nextY = pacMan.y + pacMan.dy;
+
+    // Comprueba si la siguiente posición es una pared
+    if (currentMaze[nextY][nextX] !== 1) {
+        pacMan.x = nextX;
+        pacMan.y = nextY;
+    }
+
+    // Detecta el cambio de nivel (llegando a una posición específica)
+    if (pacMan.x === lastCol-1 && pacMan.y === lastRow) {
+        changeLevel();
+    }
+}
+function changeLevel() {
+    currentLevel++;
+    if (currentLevel <= mazeLevels.length) {
+        currentMaze = mazeLevels[currentLevel - 1];
+        // Recalcular las últimas coordenadas del laberinto actual
+        lastRow = currentMaze.length - 1;
+        lastCol = currentMaze[lastRow].length - 1;
+        switch (currentLevel) {
+            case 1:
+                pacManImage.src = 'Numberblock 1.png';
+                endImage.src = 'Numberblock 2.png';
+                break;
+            case 2:
+                pacManImage.src = 'Numberblock 2.png'; // Cambiar a la imagen de Pac-Man del nivel 2
+                endImage.src = 'Numberblock 3.png'; // Cambiar a la imagen de fin del nivel 2
+                break;
+        }
+        // Reiniciar las coordenadas de end.x y end.y para pacManImage
+        pacMan.x = 1;
+        pacMan.y = 1;
+        end.x = lastCol-1;
+        end.y = lastRow;
+    } else {
+        // Mostrar mensaje de victoria
+        alert('¡Felicidades! Has completado todos los niveles.');
+        // Reiniciar el juego
+        currentLevel = 1;
+        currentMaze = mazeLevels[currentLevel - 1];
+        pacManImage.src = 'Numberblock 1.png';
+        endImage.src = 'Numberblock 2.png';
+        pacMan.x = 1;
+        pacMan.y = 1;
+        end.x = lastCol-1;
+        end.y = lastRow;
+    }
+}
+function changeLevel2() {
+    currentLevel++;
+    if (currentLevel <= mazeLevels.length) {
+        currentMaze = mazeLevels[currentLevel - 1];
+    } else {
+        // Reiniciar automáticamente el juego después de completar todos los niveles
+        setTimeout(() => {
+            currentLevel = 1;
+            currentMaze = mazeLevels[currentLevel - 1];
+        }, 5000);
+    }
+}
+
+
+function update() {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    drawMaze();
+    drawPacMan();
+    drawEnd();
+    requestAnimationFrame(update);
+}
+
+update();
+
+// Event listener para capturar las teclas presionadas
+document.addEventListener('keydown', movePacMan);
+
 */
